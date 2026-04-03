@@ -1,17 +1,5 @@
 # Path Planning of a Mobile Robot with Real-Time Feedback from Mounted Camera and LiDAR Sensors
 
-## Project Overview
-
-| Task | Description | Owner | Status |
-|------|-------------|-------|--------|
-| A | Gazebo Simulation Environment | Sunil Bishnoi | ✅ Complete |
-| B | LiDAR Integration & Filtering | Sunil Bishnoi | ✅ Complete |
-| C | Camera Integration & HSV Segmentation | Sunny Kumar | ✅ Complete |
-| D | Sensor Fusion Pipeline | Sunny Kumar | 🔄 Partial |
-| E | APF Path Planner | Sunil Bishnoi | ✅ Complete |
-
----
-
 ## Directory Structure
 
 ```
@@ -95,7 +83,7 @@ mobile_robot_ws/
 ## Dependencies
 
 ### ROS 2 Distribution
-- **ROS 2 Jazzy** (Ubuntu 24.04 or Noble) — current system
+- **ROS 2 Jazzy** (Ubuntu 24.04 or Noble)
 - **Gazebo Harmonic** (via `gz-sim`)
 
 ### ROS 2 Packages
@@ -127,13 +115,6 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
-Build a single package (faster during development):
-```bash
-colcon build --packages-select obstacle_msgs
-colcon build --packages-select robot_description robot_simulation
-colcon build --packages-select lidar_processing camera_processing sensor_fusion apf_planner
-```
-
 ---
 
 ## Running
@@ -157,112 +138,83 @@ ros2 launch robot_simulation full_system.launch.py goal_x:=12.0 goal_y:=0.0
 
 ### Option 2 — Individual Nodes (for debugging)
 
-**Terminal 1 — Simulation only:**
-```bash
-ros2 launch robot_simulation simulation.launch.py
-```
-
-**Terminal 2 — LiDAR filter:**
-```bash
-ros2 launch lidar_processing lidar.launch.py
-```
-
-**Terminal 3 — Camera processing:**
-```bash
-ros2 launch camera_processing camera.launch.py
-```
-
-**Terminal 4 — Sensor fusion:**
-```bash
-ros2 launch sensor_fusion fusion.launch.py
-```
-
-**Terminal 5 — APF planner:**
-```bash
-ros2 launch apf_planner planner.launch.py
-```
-
-**Terminal 6 — Send a goal manually:**
-```bash
-ros2 topic pub --once /goal_pose geometry_msgs/PoseStamped \
-  '{ header: { frame_id: "odom" },
-     pose: { position: { x: 12.0, y: 0.0, z: 0.0 },
-             orientation: { w: 1.0 } } }'
-```
+| Node | Launch Command | Topic Output |
+|------|----------------|--------------|
+| **Simulation** | `ros2 launch robot_simulation simulation.launch.py` | `/scan`, `/camera/image_raw` |
+| **LiDAR Filter** | `ros2 launch lidar_processing lidar.launch.py` | `/scan_filtered` |
+| **Camera Proc** | `ros2 launch camera_processing camera.launch.py` | `/camera/detections` |
+| **Sensor Fusion** | `ros2 launch sensor_fusion fusion.launch.py` | `/fused_obstacles` |
+| **APF Planner** | `ros2 launch apf_planner planner.launch.py` | `/cmd_vel` |
 
 ---
 
 ## Topic Map
 
-```
-/scan                   ← Gazebo Hokuyo plugin (10 Hz)
-        │
-        ▼
-/scan_filtered          ← lidar_filter_node  (invalid removal + median)
-/obstacles_cloud        ← lidar_filter_node  (PointCloud2)
-/obstacle_positions     ← lidar_filter_node  (MarkerArray for RViz)
+```mermaid
+graph TD
+    LiDAR[/scan/] --> LF[lidar_filter_node]
+    LF --> SF[/scan_filtered/]
+    LF --> OC[/obstacles_cloud/]
 
-/camera/image_raw       ← Gazebo camera plugin (30 fps)
-/camera/camera_info     ← Gazebo camera plugin
-        │
-        ▼
-/camera/image_rectified ← camera_node  (undistorted)
-/camera/image_segmented ← camera_node  (HSV debug overlay)
-/camera/detections      ← camera_node  (ObstacleArray with bboxes)
+    Cam[/camera/image_raw/] --> CN[camera_node]
+    CN --> CD[/camera/detections/]
+    CN --> SR[/camera/image_rectified/]
 
-/scan_filtered  ─┐
-                 ├─ ApproximateTimeSynchronizer ─▶ fusion_node
-/camera/detections ─┘
-        │
-        ▼
-/fused_obstacles        ← fusion_node  (position-labelled ObstacleArray)
-/fused_markers          ← fusion_node  (MarkerArray for RViz)
+    SF --> FN[fusion_node]
+    CD --> FN
+    FN --> FO[/fused_obstacles/]
 
-/odom                   ← diff_drive_controller
-/scan_filtered          ┐
-/goal_pose              ├─▶ apf_planner
-/fused_obstacles (opt.) ┘
-        │
-        ▼
-/cmd_vel                ← apf_planner  (Twist to robot)
-/apf_force              ← apf_planner  (Vector3 debug)
-/apf_path_markers       ← apf_planner  (MarkerArray path trail)
+    SF --> APF[apf_planner]
+    FO -.-> APF
+    GP[goal_publisher] --> APF
+    Odom[/odom/] --> APF
+    
+    APF --> CV[/cmd_vel/]
+    APF --> AM[/apf_path_markers/]
 ```
 
 ---
 
 ## Sensor Specifications
 
-| Sensor | Parameter | Value |
-|--------|-----------|-------|
-| Hokuyo UTM-30LX | FOV | 270° |
-| | Angular resolution | 0.25° (1080 rays) |
-| | Max range | 30 m |
-| | Update rate | 10 Hz |
-| RGB Camera | Resolution | 640 × 480 |
-| | Frame rate | 30 fps |
-| | H-FOV | 80° |
+| Sensor | Parameter | Value | Notes |
+|--------|-----------|-------|-------|
+| **Hokuyo UTM-30LX** | FOV | 270° | Centred on robot front |
+| | Angular Res | 0.25° | 1080 rays per scan |
+| | Range | 0.1 - 30.0 m | Filtered at 10 Hz |
+| **RGB Camera** | Resolution | 640 × 480 | 30 FPS |
+| | H-FOV | 80° | Tilted 5° down |
+| | Distortion | [0, 0, 0, 0, 0] | Pinhole model (Ideal) |
 
 ---
 
-## APF Planner Parameters
+## APF Path Planner
 
-| Parameter | Symbol | Value | Notes |
-|-----------|--------|-------|-------|
-| Attractive gain | k_att | 1.2 | Quadratic → conic switch |
-| Conic switch distance | d_star | 1.5 m | |
-| Repulsive gain | k_rep | 1.5 | Inverse-square |
-| Influence radius | d0 | 1.5 m | Zero force beyond this |
-| Safety stop | d_safe | 0.25 m | Emergency stop |
-| Stuck velocity | v_stuck | 0.03 m/s | Minima detection threshold |
-| Stuck timeout | t_stuck | 3.0 s | Before escape triggers |
+The planner implements an **Artificial Potential Field** (APF) to guide the robot toward a goal while reactively avoiding obstacles.
+
+### Features
+- **Conic-Well Attractive Field**: Swaps from quadratic (linear force) to conic (constant force) at a specific distance to prevent unbounded velocities far from the goal.
+- **Inverse-Square Repulsive Field**: Obstacles generate a force proportional to $1/d^2$, ensuring strong avoidance as the robot gets closer.
+- **Local Minima Recovery**: Automatically detects if the robot is stuck (speed below threshold for >3s) and initiates a random-walk escape manoeuvre.
+- **Safety Stop**: Triggers an emergency stop and instant escape if an obstacle is detected within the safety radius.
+
+### Parameters (Latest)
+
+| Parameter | Key | Value | Symbol |
+|-----------|-----|-------|--------|
+| **Attractive Gain** | `k_att` | **1.2** | $\xi$ |
+| **Switch Distance** | `d_star` | **1.5 m** | $d^*$ |
+| **Repulsive Gain** | `k_rep` | **1.5** | $\eta$ |
+| **Influence Radius** | `d_influence` | **1.0 m** | $\rho_0$ |
+| **Safety Radius** | `d_safe` | **0.25 m** | $d_{safe}$ |
+| **Max Linear Vel** | `max_linear_vel` | **3.5 m/s** | $v_{max}$ |
+| **Max Angular Vel** | `max_angular_vel` | **4.0 rad/s** | $\omega_{max}$ |
+| **Force Scaling** | `force_to_vel_scale` | **1.5** | - |
 
 ---
 
-## Known Issues / Future Work
+## Performance & Known Issues
 
-- **Task D**: Fusion node needs calibration verification with real extrinsics
-- **Local Minima**: APF observed in narrow-corridor scenarios — MPC/RL augmentation planned
-- **Dynamic Obstacles**: APF repulsive field reacts to LiDAR returns only; fused velocity
-  estimation of dynamic obstacles can further improve avoidance
-- **Map Integration**: Currently uses `odom` frame; migration to `map` frame with SLAM planned
+- **Sensor Fusion**: Now functional with asynchronous TF lookup and ApproximateTime synchronisation.
+- **Dynamic Obstacles**: The APF reacts to LiDAR returns instantly; however, fused velocity estimation for better predictive avoidance is a future goal.
+- **Map Integration**: Currently operates in the `odom` frame. Migration to `map` frame with SLAM (e.g., Toolbox or Cartographer) is planned for global consistency.
