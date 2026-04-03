@@ -1,0 +1,37 @@
+[0.883s] Invoking command in '/home/craz/mobile_robot_planning/build/sensor_fusion': AMENT_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com LD_LIBRARY_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/craz/mobile_robot_planning/build/sensor_fusion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages:/home/craz/mobile_robot_planning/install/obstacle_msgs/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/craz/mobile_robot_planning/build/sensor_fusion/build
+[1.093s] running develop
+[1.249s] Removing /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor-fusion.egg-link (link to .)
+[1.290s] Invoked command in '/home/craz/mobile_robot_planning/build/sensor_fusion' returned '0': AMENT_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com LD_LIBRARY_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/craz/mobile_robot_planning/build/sensor_fusion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages:/home/craz/mobile_robot_planning/install/obstacle_msgs/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/craz/mobile_robot_planning/build/sensor_fusion/build
+[1.292s] Invoking command in '/home/craz/mobile_robot_planning/src/sensor_fusion': AMENT_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com LD_LIBRARY_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/craz/mobile_robot_planning/build/sensor_fusion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages:/home/craz/mobile_robot_planning/install/obstacle_msgs/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/sensor_fusion build --build-base /home/craz/mobile_robot_planning/build/sensor_fusion/build install --record /home/craz/mobile_robot_planning/build/sensor_fusion/install.log --single-version-externally-managed install_data --force
+[1.484s] running egg_info
+[1.495s] writing ../../build/sensor_fusion/sensor_fusion.egg-info/PKG-INFO
+[1.495s] writing dependency_links to ../../build/sensor_fusion/sensor_fusion.egg-info/dependency_links.txt
+[1.495s] writing entry points to ../../build/sensor_fusion/sensor_fusion.egg-info/entry_points.txt
+[1.495s] writing requirements to ../../build/sensor_fusion/sensor_fusion.egg-info/requires.txt
+[1.495s] writing top-level names to ../../build/sensor_fusion/sensor_fusion.egg-info/top_level.txt
+[1.517s] reading manifest file '../../build/sensor_fusion/sensor_fusion.egg-info/SOURCES.txt'
+[1.517s] writing manifest file '../../build/sensor_fusion/sensor_fusion.egg-info/SOURCES.txt'
+[1.518s] running build
+[1.518s] running build_py
+[1.518s] creating /home/craz/mobile_robot_planning/build/sensor_fusion/build
+[1.518s] creating /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib
+[1.518s] creating /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+[1.518s] copying sensor_fusion/__init__.py -> /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+[1.518s] copying sensor_fusion/fusion_node.py -> /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+[1.518s] running install
+[1.522s] running install_lib
+[1.535s] creating /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+[1.535s] copying /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion/__init__.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+[1.535s] copying /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion/fusion_node.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+[1.535s] byte-compiling /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion/__init__.py to __init__.cpython-312.pyc
+[1.535s] byte-compiling /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion/fusion_node.py to fusion_node.cpython-312.pyc
+[1.538s] running install_data
+[1.538s] copying resource/sensor_fusion -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index/resource_index/packages
+[1.538s] copying package.xml -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion
+[1.538s] copying launch/fusion.launch.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion/launch
+[1.538s] running install_egg_info
+[1.550s] Copying ../../build/sensor_fusion/sensor_fusion.egg-info to /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion-1.0.0-py3.12.egg-info
+[1.551s] running install_scripts
+[1.626s] Installing fusion_node script to /home/craz/mobile_robot_planning/install/sensor_fusion/lib/sensor_fusion
+[1.626s] writing list of installed files to '/home/craz/mobile_robot_planning/build/sensor_fusion/install.log'
+[1.649s] Invoked command in '/home/craz/mobile_robot_planning/src/sensor_fusion' returned '0': AMENT_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs:${CMAKE_PREFIX_PATH} DEBUGINFOD_URLS=https://debuginfod.ubuntu.com LD_LIBRARY_PATH=/home/craz/mobile_robot_planning/install/obstacle_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/craz/mobile_robot_planning/build/sensor_fusion/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages:/home/craz/mobile_robot_planning/install/obstacle_msgs/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/sensor_fusion build --build-base /home/craz/mobile_robot_planning/build/sensor_fusion/build install --record /home/craz/mobile_robot_planning/build/sensor_fusion/install.log --single-version-externally-managed install_data --force

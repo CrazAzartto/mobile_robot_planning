@@ -1,0 +1,1 @@
+/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_cmake/rosidl_cmake_export_typesupport_targets-extras.cmake

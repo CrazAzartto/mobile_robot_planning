@@ -1,0 +1,33 @@
+running develop
+Removing /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera-processing.egg-link (link to .)
+running egg_info
+writing ../../build/camera_processing/camera_processing.egg-info/PKG-INFO
+writing dependency_links to ../../build/camera_processing/camera_processing.egg-info/dependency_links.txt
+writing entry points to ../../build/camera_processing/camera_processing.egg-info/entry_points.txt
+writing requirements to ../../build/camera_processing/camera_processing.egg-info/requires.txt
+writing top-level names to ../../build/camera_processing/camera_processing.egg-info/top_level.txt
+reading manifest file '../../build/camera_processing/camera_processing.egg-info/SOURCES.txt'
+writing manifest file '../../build/camera_processing/camera_processing.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/craz/mobile_robot_planning/build/camera_processing/build
+creating /home/craz/mobile_robot_planning/build/camera_processing/build/lib
+creating /home/craz/mobile_robot_planning/build/camera_processing/build/lib/camera_processing
+copying camera_processing/__init__.py -> /home/craz/mobile_robot_planning/build/camera_processing/build/lib/camera_processing
+copying camera_processing/camera_node.py -> /home/craz/mobile_robot_planning/build/camera_processing/build/lib/camera_processing
+running install
+running install_lib
+creating /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing
+copying /home/craz/mobile_robot_planning/build/camera_processing/build/lib/camera_processing/__init__.py -> /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing
+copying /home/craz/mobile_robot_planning/build/camera_processing/build/lib/camera_processing/camera_node.py -> /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing
+byte-compiling /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing/__init__.py to __init__.cpython-312.pyc
+byte-compiling /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing/camera_node.py to camera_node.cpython-312.pyc
+running install_data
+copying resource/camera_processing -> /home/craz/mobile_robot_planning/install/camera_processing/share/ament_index/resource_index/packages
+copying package.xml -> /home/craz/mobile_robot_planning/install/camera_processing/share/camera_processing
+copying launch/camera.launch.py -> /home/craz/mobile_robot_planning/install/camera_processing/share/camera_processing/launch
+running install_egg_info
+Copying ../../build/camera_processing/camera_processing.egg-info to /home/craz/mobile_robot_planning/install/camera_processing/lib/python3.12/site-packages/camera_processing-1.0.0-py3.12.egg-info
+running install_scripts
+Installing camera_node script to /home/craz/mobile_robot_planning/install/camera_processing/lib/camera_processing
+writing list of installed files to '/home/craz/mobile_robot_planning/build/camera_processing/install.log'

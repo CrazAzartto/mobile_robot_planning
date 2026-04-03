@@ -1,0 +1,24 @@
+running develop
+running egg_info
+creating sensor_fusion.egg-info
+writing sensor_fusion.egg-info/PKG-INFO
+writing dependency_links to sensor_fusion.egg-info/dependency_links.txt
+writing entry points to sensor_fusion.egg-info/entry_points.txt
+writing requirements to sensor_fusion.egg-info/requires.txt
+writing top-level names to sensor_fusion.egg-info/top_level.txt
+writing manifest file 'sensor_fusion.egg-info/SOURCES.txt'
+reading manifest file 'sensor_fusion.egg-info/SOURCES.txt'
+writing manifest file 'sensor_fusion.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor-fusion.egg-link (link to .)
+Installing fusion_node script to /home/craz/mobile_robot_planning/install/sensor_fusion/lib/sensor_fusion
+
+Installed /home/craz/mobile_robot_planning/build/sensor_fusion
+running symlink_data
+creating /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index
+creating /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index/resource_index
+creating /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index/resource_index/packages
+symbolically linking /home/craz/mobile_robot_planning/build/sensor_fusion/resource/sensor_fusion -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index/resource_index/packages
+symbolically linking /home/craz/mobile_robot_planning/build/sensor_fusion/package.xml -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion
+creating /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion/launch
+symbolically linking /home/craz/mobile_robot_planning/build/sensor_fusion/launch/fusion.launch.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion/launch

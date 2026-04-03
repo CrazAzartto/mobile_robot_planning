@@ -1,0 +1,33 @@
+running develop
+Removing /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor-fusion.egg-link (link to .)
+running egg_info
+writing ../../build/sensor_fusion/sensor_fusion.egg-info/PKG-INFO
+writing dependency_links to ../../build/sensor_fusion/sensor_fusion.egg-info/dependency_links.txt
+writing entry points to ../../build/sensor_fusion/sensor_fusion.egg-info/entry_points.txt
+writing requirements to ../../build/sensor_fusion/sensor_fusion.egg-info/requires.txt
+writing top-level names to ../../build/sensor_fusion/sensor_fusion.egg-info/top_level.txt
+reading manifest file '../../build/sensor_fusion/sensor_fusion.egg-info/SOURCES.txt'
+writing manifest file '../../build/sensor_fusion/sensor_fusion.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/craz/mobile_robot_planning/build/sensor_fusion/build
+creating /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib
+creating /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+copying sensor_fusion/__init__.py -> /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+copying sensor_fusion/fusion_node.py -> /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion
+running install
+running install_lib
+creating /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+copying /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion/__init__.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+copying /home/craz/mobile_robot_planning/build/sensor_fusion/build/lib/sensor_fusion/fusion_node.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion
+byte-compiling /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion/__init__.py to __init__.cpython-312.pyc
+byte-compiling /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion/fusion_node.py to fusion_node.cpython-312.pyc
+running install_data
+copying resource/sensor_fusion -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/ament_index/resource_index/packages
+copying package.xml -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion
+copying launch/fusion.launch.py -> /home/craz/mobile_robot_planning/install/sensor_fusion/share/sensor_fusion/launch
+running install_egg_info
+Copying ../../build/sensor_fusion/sensor_fusion.egg-info to /home/craz/mobile_robot_planning/install/sensor_fusion/lib/python3.12/site-packages/sensor_fusion-1.0.0-py3.12.egg-info
+running install_scripts
+Installing fusion_node script to /home/craz/mobile_robot_planning/install/sensor_fusion/lib/sensor_fusion
+writing list of installed files to '/home/craz/mobile_robot_planning/build/sensor_fusion/install.log'

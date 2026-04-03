@@ -1,0 +1,44 @@
+[0.018s] Invoking command in '/home/craz/mobile_robot_planning/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/craz/mobile_robot_planning/src/robot_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/craz/mobile_robot_planning/install/robot_description
+[0.185s] -- The C compiler identification is GNU 13.3.0
+[0.185s] -- The CXX compiler identification is GNU 13.3.0
+[0.185s] -- Detecting C compiler ABI info
+[0.199s] -- Detecting C compiler ABI info - done
+[0.205s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.205s] -- Detecting C compile features
+[0.205s] -- Detecting C compile features - done
+[0.214s] -- Detecting CXX compiler ABI info
+[0.301s] -- Detecting CXX compiler ABI info - done
+[0.309s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.309s] -- Detecting CXX compile features
+[0.309s] -- Detecting CXX compile features - done
+[0.314s] -- Found ament_cmake: 2.5.5 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.453s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[0.519s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.637s] -- Configuring done (0.6s)
+[0.638s] -- Generating done (0.0s)
+[0.639s] -- Build files have been written to: /home/craz/mobile_robot_planning/build/robot_description
+[0.644s] Invoked command in '/home/craz/mobile_robot_planning/build/robot_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/craz/mobile_robot_planning/src/robot_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/craz/mobile_robot_planning/install/robot_description
+[0.644s] Invoking command in '/home/craz/mobile_robot_planning/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/craz/mobile_robot_planning/build/robot_description -- -j12 -l12
+[0.681s] Invoked command in '/home/craz/mobile_robot_planning/build/robot_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/craz/mobile_robot_planning/build/robot_description -- -j12 -l12
+[0.691s] Invoking command in '/home/craz/mobile_robot_planning/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/craz/mobile_robot_planning/build/robot_description
+[0.700s] -- Install configuration: ""
+[0.701s] -- Execute custom install script
+[0.701s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/urdf/robot.urdf.xacro
+[0.709s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/launch/display.launch.py
+[0.720s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/rviz/robot.rviz
+[0.728s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/ament_index/resource_index/package_run_dependencies/robot_description
+[0.739s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/ament_index/resource_index/parent_prefix_path/robot_description
+[0.750s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/environment/ament_prefix_path.sh
+[0.757s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/environment/ament_prefix_path.dsv
+[0.768s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/environment/path.sh
+[0.778s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/environment/path.dsv
+[0.787s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/local_setup.bash
+[0.796s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/local_setup.sh
+[0.803s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/local_setup.zsh
+[0.813s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/local_setup.dsv
+[0.821s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/package.dsv
+[0.828s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/ament_index/resource_index/packages/robot_description
+[0.837s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/cmake/robot_descriptionConfig.cmake
+[0.847s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/cmake/robot_descriptionConfig-version.cmake
+[0.854s] -- Symlinking: /home/craz/mobile_robot_planning/install/robot_description/share/robot_description/package.xml
+[0.865s] Invoked command in '/home/craz/mobile_robot_planning/build/robot_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/craz/mobile_robot_planning/install/sensor_fusion:/home/craz/mobile_robot_planning/install/camera_processing:/home/craz/mobile_robot_planning/install/lidar_processing:/home/craz/mobile_robot_planning/install/apf_planner:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/craz/mobile_robot_planning/build/robot_description

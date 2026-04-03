@@ -1,0 +1,1 @@
+/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_typesupport_fastrtps_cpp/obstacle_msgs/msg/detail/obstacle__rosidl_typesupport_fastrtps_cpp.hpp

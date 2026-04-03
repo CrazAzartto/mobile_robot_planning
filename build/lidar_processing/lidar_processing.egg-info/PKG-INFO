@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: lidar-processing
+Version: 1.0.0
+Summary: LiDAR data filtering and obstacle extraction node
+Maintainer: Sunil Bishnoi
+Maintainer-email: student@university.edu
+License: MIT

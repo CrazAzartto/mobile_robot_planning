@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: sensor-fusion
+Version: 1.0.0
+Summary: Sensor fusion node: time-synchronised LiDAR + camera fusion, obstacle map generation
+Maintainer: Sunny Kumar
+Maintainer-email: student@university.edu
+License: MIT

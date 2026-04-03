@@ -1,0 +1,1 @@
+/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_generator_cpp/obstacle_msgs/msg/rosidl_generator_cpp__visibility_control.hpp

@@ -1,0 +1,1 @@
+/home/craz/mobile_robot_planning/src/robot_simulation/scripts/goal_publisher.py
