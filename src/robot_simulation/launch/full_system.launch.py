@@ -52,8 +52,8 @@ def generate_launch_description():
         'use_sim_time', default_value='true')
     start_rviz_arg   = DeclareLaunchArgument(
         'start_rviz', default_value='true')
-    goal_x_arg = DeclareLaunchArgument('goal_x', default_value='8.0')
-    goal_y_arg = DeclareLaunchArgument('goal_y', default_value='-5.0')
+    goal_x_arg = DeclareLaunchArgument('goal_x', default_value='12.0')
+    goal_y_arg = DeclareLaunchArgument('goal_y', default_value='5.0')
     planner_mode_arg = DeclareLaunchArgument(
         'planner_mode', default_value='mpc',
         description='Augmentation mode: mpc, rl, or none (pure APF)')

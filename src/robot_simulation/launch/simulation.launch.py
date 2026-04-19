@@ -20,7 +20,7 @@ def generate_launch_description():
     start_rviz_arg   = DeclareLaunchArgument('start_rviz', default_value='true')
 
     robot_x_arg = DeclareLaunchArgument('x_pose', default_value='0.0')
-    robot_y_arg = DeclareLaunchArgument('y_pose', default_value='0.0')
+    robot_y_arg = DeclareLaunchArgument('y_pose', default_value='-1.5')
     robot_z_arg = DeclareLaunchArgument('z_pose', default_value='0.2')
 
     use_sim_time = LaunchConfiguration('use_sim_time')
