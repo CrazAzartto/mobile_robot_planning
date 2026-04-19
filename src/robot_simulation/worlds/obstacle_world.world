@@ -79,18 +79,40 @@
     <model name="free_space_n6"><static>true</static><pose>18.0 5.0 0.01 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2.8 4.8 0.02</size></box></geometry><material><ambient>0.0 0.6 0.0 0.5</ambient><diffuse>0.0 0.6 0.0 0.5</diffuse></material></visual></link></model>
 
     <!-- South Row (y=-5.0): centers at x=2,5,8,12,15,18 -->
-    <!-- FREE South Bay (x=2.0) -->
-    <model name="free_space_s1"><static>true</static><pose>2.0 -5.0 0.01 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2.8 4.8 0.02</size></box></geometry><material><ambient>0.0 0.6 0.0 0.5</ambient><diffuse>0.0 0.6 0.0 0.5</diffuse></material></visual></link></model>
+    <!-- Filled South Bay (x=2.0) -->
+    <model name="parked_south_1"><static>true</static><pose>2.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.3 0.3 0.8 1</ambient><diffuse>0.3 0.3 0.8 1</diffuse></material></visual></link></model>
 
     <model name="parked_south_2"><static>true</static><pose>5.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.9 0.9 0.9 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material></visual></link></model>
     
-    <!-- FREE South Bay (x=8.0) -->
-    <model name="free_space_s3"><static>true</static><pose>8.0 -5.0 0.01 0 0 0</pose><link name="l"><visual name="v"><geometry><box><size>2.8 4.8 0.02</size></box></geometry><material><ambient>0.0 0.6 0.0 0.5</ambient><diffuse>0.0 0.6 0.0 0.5</diffuse></material></visual></link></model>
+    <!-- Filled South Bay (x=8.0) -->
+    <model name="parked_south_3"><static>true</static><pose>8.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.8 0.2 0.2 1</ambient><diffuse>0.8 0.2 0.2 1</diffuse></material></visual></link></model>
 
     <model name="parked_south_4"><static>true</static><pose>12.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.8 0.5 0.1 1</ambient><diffuse>0.8 0.5 0.1 1</diffuse></material></visual></link></model>
     <model name="parked_south_5"><static>true</static><pose>15.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.2 0.6 0.2 1</ambient><diffuse>0.2 0.6 0.2 1</diffuse></material></visual></link></model>
     <model name="parked_south_6"><static>true</static><pose>18.0 -5.0 0.8 0 0 1.5708</pose><link name="l"><collision name="c"><geometry><box><size>4.5 1.8 1.5</size></box></geometry></collision><visual name="v"><geometry><box><size>4.5 1.8 1.5</size></box></geometry><material><ambient>0.4 0.1 0.4 1</ambient><diffuse>0.4 0.1 0.4 1</diffuse></material></visual></link></model>
 
+
+    <!-- Chicane Barriers -->
+    <model name="barrier_1">
+      <static>true</static><pose>3.5 -1.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.5 0.5 1.0</size></box></geometry></collision>
+        <visual name="v">
+          <geometry><box><size>1.5 0.5 1.0</size></box></geometry>
+          <material><ambient>1.0 0.5 0.0 1</ambient><diffuse>1.0 0.5 0.0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+    <model name="barrier_2">
+      <static>true</static><pose>6.5 -0.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.5 0.5 1.0</size></box></geometry></collision>
+        <visual name="v">
+          <geometry><box><size>1.5 0.5 1.0</size></box></geometry>
+          <material><ambient>1.0 0.5 0.0 1</ambient><diffuse>1.0 0.5 0.0 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
 
     <!-- Goal Marker -->
     <model name="goal_marker">

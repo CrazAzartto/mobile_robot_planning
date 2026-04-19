@@ -28,7 +28,8 @@ class DynamicPath:
                  start_x: float, start_y: float,
                  end_x: float, end_y: float,
                  speed: float = 0.4,
-                 z_offset: float = 0.0):
+                 z_offset: float = 0.0,
+                 loop_type: str = 'pingpong'):
         self.name = name
         self.start_x = start_x
         self.start_y = start_y
@@ -36,6 +37,7 @@ class DynamicPath:
         self.end_y = end_y
         self.speed = speed
         self.z_offset = z_offset
+        self.loop_type = loop_type
 
         dx = end_x - start_x
         dy = end_y - start_y
@@ -80,6 +82,19 @@ class DynamicPath:
         self.update_virtual_time(real_time)
             
         one_way_time = self.length / self.speed if self.speed > 0 else 1e9
+
+        if self.loop_type == 'stop':
+            if self.virtual_time >= one_way_time:
+                x = self.end_x
+                y = self.end_y
+                yaw = self.yaw_fwd
+            else:
+                frac = self.virtual_time / one_way_time
+                x = self.start_x + frac * (self.end_x - self.start_x)
+                y = self.start_y + frac * (self.end_y - self.start_y)
+                yaw = self.yaw_fwd
+            return x, y, self.z_offset, yaw
+
         cycle_time = 2.0 * one_way_time
         t = self.virtual_time % cycle_time
 
@@ -133,8 +148,8 @@ class DynamicMoverNode(Node):
             # Pedestrian 4: North sidewalk, shorter range (y=8.25)
             DynamicPath('pedestrian_4', 12.0, 8.25, 5.0, 8.25, speed=0.3),
             
-            # Moving car 1: Central aisle (Eastbound, y=0.9)
-            DynamicPath('moving_car_1', 0.0, 0.9, 20.0, 0.9, speed=1.2, z_offset=0.65),
+            # Moving car 1: Central aisle (Eastbound, y=1.8 to stay out of chicane)
+            DynamicPath('moving_car_1', 0.0, 1.8, 25.0, 1.8, speed=1.2, z_offset=0.65, loop_type='stop'),
         ]
 
         self._start_time = time.time()

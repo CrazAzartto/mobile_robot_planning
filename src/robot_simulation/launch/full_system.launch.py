@@ -196,7 +196,7 @@ def generate_launch_description():
         simulation,
 
         # Wait for Gazebo + robot spawn, then start processing nodes
-        TimerAction(period=6.0, actions=[
+        TimerAction(period=13.0, actions=[
             LogInfo(msg='[full_system] Starting sensor processing nodes...'),
             lidar_launch,
             camera_launch,
@@ -205,13 +205,13 @@ def generate_launch_description():
         ]),
 
         # Fusion needs both sensors active first
-        TimerAction(period=8.0, actions=[
+        TimerAction(period=15.0, actions=[
             LogInfo(msg='[full_system] Starting sensor fusion (with Kalman tracker)...'),
             fusion_launch,
         ]),
 
         # Planners + supervisor + evaluation start last
-        TimerAction(period=10.0, actions=[
+        TimerAction(period=17.0, actions=[
             LogInfo(msg='[full_system] Starting APF planner + MPC + RL + Supervisor...'),
             planner_launch,
             mpc_launch,
