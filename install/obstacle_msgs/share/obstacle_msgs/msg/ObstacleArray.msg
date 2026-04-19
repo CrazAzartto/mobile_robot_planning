@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/src/obstacle_msgs/msg/ObstacleArray.msg

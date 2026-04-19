@@ -1,9 +1,0 @@
-setup.py
-obstacle_msgs/__init__.py
-obstacle_msgs.egg-info/PKG-INFO
-obstacle_msgs.egg-info/SOURCES.txt
-obstacle_msgs.egg-info/dependency_links.txt
-obstacle_msgs.egg-info/top_level.txt
-obstacle_msgs/msg/__init__.py
-obstacle_msgs/msg/_obstacle.py
-obstacle_msgs/msg/_obstacle_array.py

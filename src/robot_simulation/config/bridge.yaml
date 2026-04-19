@@ -49,3 +49,10 @@
   ros_type_name: "sensor_msgs/msg/CameraInfo"
   gz_type_name: "gz.msgs.CameraInfo"
   direction: GZ_TO_ROS
+
+# Ground truth odometry (from OdometryPublisher — actual model pose, no drift)
+- ros_topic_name: "odom_ground_truth"
+  gz_topic_name: "/odom_ground_truth"
+  ros_type_name: "nav_msgs/msg/Odometry"
+  gz_type_name: "gz.msgs.Odometry"
+  direction: GZ_TO_ROS

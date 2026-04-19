@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_typesupport_introspection_c/obstacle_msgs/msg/detail/obstacle__rosidl_typesupport_introspection_c.h

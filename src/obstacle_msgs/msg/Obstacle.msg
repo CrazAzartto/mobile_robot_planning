@@ -5,6 +5,9 @@ float32 x          # Position in robot frame (meters)
 float32 y
 float32 z
 
+float32 vx         # Estimated velocity (m/s) — from Kalman filter
+float32 vy         # Estimated velocity (m/s) — from Kalman filter
+
 float32 width      # Bounding box dimensions (meters)
 float32 height
 float32 depth
@@ -17,3 +20,4 @@ float32 bbox_h
 string  label      # Color label / class from HSV segmentation
 float32 confidence # Detection confidence [0.0, 1.0]
 bool    is_dynamic # True if identified as moving obstacle
+uint32  track_id   # Persistent tracking ID (0 = untracked)

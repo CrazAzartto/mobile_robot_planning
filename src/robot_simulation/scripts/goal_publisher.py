@@ -18,7 +18,7 @@ class GoalPublisher(Node):
         super().__init__('goal_publisher')
 
         self.declare_parameter('goal_x',     8.0)
-        self.declare_parameter('goal_y',     0.0)
+        self.declare_parameter('goal_y',    -5.0)
         self.declare_parameter('goal_yaw',   0.0)
         self.declare_parameter('delay_sec',  2.0)   # wait before publishing
         self.declare_parameter('frame_id', 'odom')
@@ -30,10 +30,11 @@ class GoalPublisher(Node):
         delay     = self.get_parameter('delay_sec').value
 
         self.pub = self.create_publisher(PoseStamped, '/goal_pose', 10)
-        self._timer = self.create_timer(delay, self._publish_goal)
+        self._timer = self.create_timer(1.0, self._publish_goal)
+        self._pub_count = 0
         self.get_logger().info(
             f'GoalPublisher: will publish goal ({self._gx}, {self._gy}) '
-            f'in {delay} s on /goal_pose')
+            f'several times on /goal_pose')
 
     def _publish_goal(self):
         import math
@@ -53,11 +54,14 @@ class GoalPublisher(Node):
         msg.pose.orientation.y = 0.0
 
         self.pub.publish(msg)
+        self._pub_count += 1
         self.get_logger().info(
-            f'Goal published: ({self._gx:.2f}, {self._gy:.2f}) in frame "{self._fid}"')
+            f'Goal published [{self._pub_count}/5]: ({self._gx:.2f}, {self._gy:.2f}) '
+            f'in frame "{self._fid}"')
 
-        # Cancel timer — publish only once
-        self._timer.cancel()
+        # Cancel timer after 5 publishes to fully guarantee delivery
+        if self._pub_count >= 5:
+            self._timer.cancel()
 
 
 def main(args=None):
@@ -69,7 +73,10 @@ def main(args=None):
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_generator_py/obstacle_msgs/obstacle_msgs_s__rosidl_typesupport_c.so" "TARGETS" "obstacle_msgs_s__rosidl_typesupport_c" "DESTINATION" "lib/python3.12/site-packages/obstacle_msgs")

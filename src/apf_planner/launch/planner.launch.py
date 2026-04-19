@@ -24,7 +24,7 @@ def generate_launch_description():
 
                 # ---- Repulsive (inverse-square) ---
                 'k_rep':                 1.5,
-                'd_influence':           1.0,
+                'd_influence':           1.5,
                 'd_safe':                0.25,
 
                 # ---- Velocity limits ---
@@ -45,6 +45,11 @@ def generate_launch_description():
 
                 # ---- Control rate ---
                 'control_rate':         30.0,
+
+                # ---- Supervisor integration ---
+                'supervised_mode':      True,
+                'prediction_horizon':   1.0,
             }],
         ),
     ])
+

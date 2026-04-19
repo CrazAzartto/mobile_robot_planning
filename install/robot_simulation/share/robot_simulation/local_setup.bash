@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/build/robot_simulation/ament_cmake_environment_hooks/local_setup.bash

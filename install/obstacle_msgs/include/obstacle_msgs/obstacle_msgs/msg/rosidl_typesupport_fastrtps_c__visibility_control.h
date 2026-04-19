@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/build/obstacle_msgs/rosidl_typesupport_fastrtps_c/obstacle_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h

@@ -46,6 +46,187 @@ from std_msgs.msg import ColorRGBA
 from obstacle_msgs.msg import Obstacle, ObstacleArray
 
 
+# ================================================================== #
+#  Kalman Filter Tracker for Dynamic Obstacles                        #
+# ================================================================== #
+
+class KalmanTrack:
+    """Single obstacle track with constant-velocity Kalman filter.
+
+    State vector:   x = [px, py, vx, vy]^T
+    Measurement:    z = [px, py]^T
+    Motion model:   constant velocity (px' = px + vx*dt, etc.)
+    """
+
+    _next_id = 1   # class-level ID counter
+
+    def __init__(self, x0: float, y0: float, dt: float = 0.1):
+        self.track_id = KalmanTrack._next_id
+        KalmanTrack._next_id += 1
+
+        self.dt = dt
+        self.age = 0           # number of updates
+        self.missed = 0        # consecutive missed associations
+        self.label = ''
+        self.is_dynamic = False
+        self.confidence = 0.5
+
+        # State: [px, py, vx, vy]
+        self.x = np.array([x0, y0, 0.0, 0.0], dtype=np.float64)
+
+        # State covariance
+        self.P = np.diag([0.5, 0.5, 1.0, 1.0])
+
+        # Process noise
+        q_pos = 0.1
+        q_vel = 0.5
+        self.Q = np.diag([q_pos, q_pos, q_vel, q_vel])
+
+        # Measurement noise
+        self.R = np.diag([0.1, 0.1])
+
+        # Measurement matrix (observe position only)
+        self.H = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+        ], dtype=np.float64)
+
+    def predict(self):
+        """Predict step: constant velocity model."""
+        dt = self.dt
+        F = np.array([
+            [1, 0, dt, 0],
+            [0, 1, 0, dt],
+            [0, 0, 1,  0],
+            [0, 0, 0,  1],
+        ], dtype=np.float64)
+        self.x = F @ self.x
+        self.P = F @ self.P @ F.T + self.Q
+
+    def update(self, z_x: float, z_y: float):
+        """Update step with position measurement."""
+        z = np.array([z_x, z_y])
+        y = z - self.H @ self.x                       # innovation
+        S = self.H @ self.P @ self.H.T + self.R       # innovation covariance
+        K = self.P @ self.H.T @ np.linalg.inv(S)      # Kalman gain
+        self.x = self.x + K @ y
+        I = np.eye(4)
+        self.P = (I - K @ self.H) @ self.P
+        self.age += 1
+        self.missed = 0
+
+    @property
+    def position(self):
+        return self.x[0], self.x[1]
+
+    @property
+    def velocity(self):
+        return self.x[2], self.x[3]
+
+    @property
+    def speed(self):
+        return np.hypot(self.x[2], self.x[3])
+
+
+class KalmanTracker:
+    """Multi-object tracker using per-obstacle Kalman filters.
+
+    Uses nearest-neighbour data association with a maximum gating distance.
+    Tracks are created on first detection and removed after consecutive misses.
+    """
+
+    def __init__(self, dt: float = 0.1,
+                 gate_dist: float = 1.0,
+                 max_missed: int = 10,
+                 min_age: int = 3):
+        self.dt = dt
+        self.gate_dist = gate_dist
+        self.max_missed = max_missed
+        self.min_age = min_age
+        self.tracks: list[KalmanTrack] = []
+
+    def update(self, detections: list) -> list:
+        """Process a list of detections [(x, y, label, is_dynamic, confidence), ...].
+
+        Returns list of (track_id, x, y, vx, vy, label, is_dynamic, confidence)
+        for all confirmed tracks (age >= min_age).
+        """
+        # 1. Predict all existing tracks
+        for t in self.tracks:
+            t.predict()
+
+        # 2. Data association (greedy nearest-neighbour)
+        used_d = set()
+        used_t = set()
+
+        if self.tracks and detections:
+            # Build cost matrix (distance)
+            n_tracks = len(self.tracks)
+            n_dets = len(detections)
+            cost = np.full((n_tracks, n_dets), np.inf)
+
+            for i, t in enumerate(self.tracks):
+                for j, (dx, dy, *_) in enumerate(detections):
+                    dist = np.hypot(t.x[0] - dx, t.x[1] - dy)
+                    if dist < self.gate_dist:
+                        cost[i, j] = dist
+
+            # Greedy assignment (sort by cost, assign smallest first)
+            while True:
+                if cost.size == 0:
+                    break
+                min_idx = np.unravel_index(np.argmin(cost), cost.shape)
+                if cost[min_idx] >= self.gate_dist:
+                    break
+                i, j = min_idx
+                if i not in used_t and j not in used_d:
+                    dx, dy = detections[j][0], detections[j][1]
+                    self.tracks[i].update(dx, dy)
+                    # Update metadata
+                    if len(detections[j]) > 2:
+                        self.tracks[i].label = detections[j][2]
+                    if len(detections[j]) > 3:
+                        self.tracks[i].is_dynamic = detections[j][3]
+                    if len(detections[j]) > 4:
+                        self.tracks[i].confidence = detections[j][4]
+                    used_t.add(i)
+                    used_d.add(j)
+                cost[i, :] = np.inf
+                cost[:, j] = np.inf
+
+        # 3. Mark unmatched tracks as missed
+        for i, t in enumerate(self.tracks):
+            if i not in used_t:
+                t.missed += 1
+
+        # 4. Create new tracks for unmatched detections
+        for j, det in enumerate(detections):
+            if j not in used_d:
+                new_track = KalmanTrack(det[0], det[1], self.dt)
+                if len(det) > 2:
+                    new_track.label = det[2]
+                if len(det) > 3:
+                    new_track.is_dynamic = det[3]
+                if len(det) > 4:
+                    new_track.confidence = det[4]
+                self.tracks.append(new_track)
+
+        # 5. Remove dead tracks
+        self.tracks = [t for t in self.tracks if t.missed < self.max_missed]
+
+        # 6. Return confirmed tracks
+        results = []
+        for t in self.tracks:
+            if t.age >= self.min_age:
+                px, py = t.position
+                vx, vy = t.velocity
+                results.append((
+                    t.track_id, px, py, vx, vy,
+                    t.label, t.is_dynamic, t.confidence
+                ))
+        return results
+
+
 class FusionNode(Node):
     """Fuses filtered LiDAR scans with camera-based bounding box detections."""
 
@@ -137,7 +318,16 @@ class FusionNode(Node):
         self.create_timer(1.0, self._try_load_extrinsic)
 
         self._fusion_count = 0
-        self.get_logger().info('FusionNode initialised. Waiting for sensor data...')
+
+        # Kalman filter tracker for dynamic obstacle tracking
+        self._tracker = KalmanTracker(
+            dt=0.1,         # update interval (10 Hz LiDAR)
+            gate_dist=1.0,  # max association distance (m)
+            max_missed=10,  # remove after 10 consecutive misses
+            min_age=3       # confirm after 3 updates
+        )
+
+        self.get_logger().info('FusionNode initialised (with Kalman tracker). Waiting for sensor data...')
 
     # -------------------------------------------------------------------- #
     # Camera info callback                                                  #
@@ -288,20 +478,76 @@ class FusionNode(Node):
         lidar_only_obs = self._cluster_lidar_points(unmatched_pts, scan_msg.header)
         fused_obstacles.extend(lidar_only_obs)
 
+        # ---- Kalman filter tracking -----------------------------------------
+        # Build detection list for tracker: (x, y, label, is_dynamic, confidence)
+        raw_detections = []
+        for obs in fused_obstacles:
+            if obs.x != 0.0 or obs.y != 0.0:
+                raw_detections.append((
+                    obs.x, obs.y, obs.label,
+                    obs.is_dynamic, obs.confidence
+                ))
+
+        # Run tracker update
+        tracked = self._tracker.update(raw_detections)
+
+        # Build output: merge tracked objects back into obstacle array
+        # Replace matching obstacles with tracked versions (with velocity),
+        # keep untracked obstacles as-is
+        tracked_obstacles = []
+        tracked_ids_used = set()
+
+        for (tid, tx, ty, tvx, tvy, tlabel, tdyn, tconf) in tracked:
+            obs = Obstacle()
+            obs.header = scan_msg.header
+            obs.x = float(tx)
+            obs.y = float(ty)
+            obs.z = 0.0
+            obs.vx = float(tvx)
+            obs.vy = float(tvy)
+            obs.track_id = int(tid)
+            obs.label = tlabel
+            obs.is_dynamic = tdyn
+            obs.confidence = tconf
+            obs.width = 0.4   # default estimated width
+            obs.height = 1.0
+            obs.depth = 0.4
+            tracked_obstacles.append(obs)
+            tracked_ids_used.add(tid)
+
+        # Also include untracked (new / not yet confirmed) obstacles
+        for obs in fused_obstacles:
+            # Check if already covered by a track
+            already_tracked = False
+            for tobs in tracked_obstacles:
+                d = np.hypot(obs.x - tobs.x, obs.y - tobs.y)
+                if d < 0.5:
+                    already_tracked = True
+                    break
+            if not already_tracked and (obs.x != 0.0 or obs.y != 0.0):
+                obs.vx = 0.0
+                obs.vy = 0.0
+                obs.track_id = 0
+                tracked_obstacles.append(obs)
+
         # ---- Publish -------------------------------------------------------
         out_array           = ObstacleArray()
         out_array.header    = scan_msg.header
-        out_array.obstacles = fused_obstacles
+        out_array.obstacles = tracked_obstacles
         self.pub_fused.publish(out_array)
 
-        markers = self._build_fused_markers(fused_obstacles, scan_msg.header)
+        markers = self._build_fused_markers(tracked_obstacles, scan_msg.header)
         self.pub_markers.publish(markers)
 
         if self._fusion_count % 50 == 0:
+            n_tracked = len([t for t in tracked_obstacles if t.track_id > 0])
+            n_moving = len([t for t in tracked_obstacles
+                           if np.hypot(t.vx, t.vy) > 0.05])
             self.get_logger().info(
                 f'[Fusion] synced_pairs={self._fusion_count}, '
-                f'fused_obstacles={len(fused_obstacles)} '
-                f'(camera={len(det_msg.obstacles)}, '
+                f'total_obstacles={len(tracked_obstacles)} '
+                f'(tracked={n_tracked}, moving={n_moving}, '
+                f'camera={len(det_msg.obstacles)}, '
                 f'lidar_only={len(lidar_only_obs)})')
 
     # -------------------------------------------------------------------- #
@@ -474,7 +720,10 @@ def main(args=None):
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

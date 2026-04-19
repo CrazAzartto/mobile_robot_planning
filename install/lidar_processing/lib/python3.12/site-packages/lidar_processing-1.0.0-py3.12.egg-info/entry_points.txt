@@ -1,2 +1,0 @@
-[console_scripts]
-lidar_filter_node = lidar_processing.lidar_filter_node:main

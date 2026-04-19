@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/src/robot_description/launch/display.launch.py

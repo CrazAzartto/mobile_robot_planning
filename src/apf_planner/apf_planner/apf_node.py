@@ -68,7 +68,8 @@ from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist, PoseStamped, Vector3, Point
 from visualization_msgs.msg import Marker, MarkerArray
-from std_msgs.msg import ColorRGBA
+from std_msgs.msg import ColorRGBA, String
+from obstacle_msgs.msg import ObstacleArray
 import tf_transformations
 
 
@@ -99,7 +100,7 @@ class APFPlannerNode(Node):
 
         # Repulsive field
         self.declare_parameter('k_rep',           1.5)   # repulsive gain
-        self.declare_parameter('d_influence',     1.0)   # influence radius (m)
+        self.declare_parameter('d_influence',     1.5)   # influence radius (m)
         self.declare_parameter('d_safe',          0.25)  # safety stop distance (m)
 
         # Robot velocity limits
@@ -121,6 +122,10 @@ class APFPlannerNode(Node):
         # Control loop
         self.declare_parameter('control_rate',    30.0)  # Hz
 
+        # Supervisor integration
+        self.declare_parameter('supervised_mode', True)  # if True, responds to /planner_mode
+        self.declare_parameter('prediction_horizon', 1.0)  # seconds for obstacle prediction
+
         self._k_att        = self.get_parameter('k_att').value
         self._d_star       = self.get_parameter('d_star').value
         self._k_rep        = self.get_parameter('k_rep').value
@@ -137,11 +142,14 @@ class APFPlannerNode(Node):
         self._esc_ang_v    = self.get_parameter('escape_angular_vel').value
         self._esc_lin_v    = self.get_parameter('escape_linear_vel').value
         self._ctrl_rate    = self.get_parameter('control_rate').value
+        self._supervised   = self.get_parameter('supervised_mode').value
+        self._pred_horizon = self.get_parameter('prediction_horizon').value
 
         # ---------------------------------------------------------------- #
         # State                                                             #
         # ---------------------------------------------------------------- #
         self._state     = PlannerState.IDLE
+        self._active    = not self._supervised   # active by default if not supervised
         self._goal_x    = 0.0
         self._goal_y    = 0.0
         self._robot_x   = 0.0
@@ -155,6 +163,9 @@ class APFPlannerNode(Node):
         self._escape_start = None   # time escape manoeuvre started
         self._escape_dir   = 1.0    # +1 or -1 for rotation direction
         self._path_history = []     # list of (x, y) for visualisation
+
+        # Fused obstacle data for velocity-aware repulsion
+        self._fused_obstacles = []  # list of (x, y, vx, vy) in robot frame
 
         # ---------------------------------------------------------------- #
         # QoS                                                               #
@@ -171,14 +182,24 @@ class APFPlannerNode(Node):
         self.create_subscription(
             LaserScan, '/scan_filtered', self._scan_callback, sensor_qos)
         self.create_subscription(
-            Odometry,  '/odom',          self._odom_callback,  10)
+            Odometry,  '/odom_ground_truth', self._odom_callback,  10)
         self.create_subscription(
             PoseStamped, '/goal_pose',   self._goal_callback,  10)
+        self.create_subscription(
+            ObstacleArray, '/fused_obstacles', self._fused_callback, 10)
+
+        # Supervisor mode subscription
+        if self._supervised:
+            self.create_subscription(
+                String, '/planner_mode', self._mode_callback, 10)
 
         # ---------------------------------------------------------------- #
         # Publishers                                                        #
         # ---------------------------------------------------------------- #
-        self.pub_cmd     = self.create_publisher(Twist,       '/cmd_vel',          10)
+        # In supervised mode, publish to /apf_cmd_vel (supervisor selects)
+        # In standalone mode, publish directly to /cmd_vel
+        cmd_topic = '/apf_cmd_vel' if self._supervised else '/cmd_vel'
+        self.pub_cmd     = self.create_publisher(Twist,       cmd_topic,           10)
         self.pub_force   = self.create_publisher(Vector3,     '/apf_force',        10)
         self.pub_markers = self.create_publisher(MarkerArray, '/apf_path_markers', 10)
 
@@ -188,8 +209,9 @@ class APFPlannerNode(Node):
         self._ctrl_timer = self.create_timer(
             1.0 / self._ctrl_rate, self._control_loop)
 
+        mode_str = 'supervised' if self._supervised else 'standalone'
         self.get_logger().info(
-            f'APFPlanner ready.\n'
+            f'APFPlanner ready ({mode_str}).\n'
             f'  k_att={self._k_att}, d_star={self._d_star} m\n'
             f'  k_rep={self._k_rep}, d_influence={self._d_inf} m\n'
             f'  max_vel=[{self._max_lin} m/s, {self._max_ang} rad/s]')
@@ -214,10 +236,12 @@ class APFPlannerNode(Node):
         (_, _, self._robot_yaw) = tf_transformations.euler_from_quaternion(
             [ori.x, ori.y, ori.z, ori.w])
 
-    def _goal_callback(self, msg: PoseStamped):
+    def _goal_callback(self, msg: PoseStamped  ):
         self._goal_x = msg.pose.position.x
         self._goal_y = msg.pose.position.y
         self._state  = PlannerState.NAVIGATING
+        if not self._supervised:
+            self._active = True
         self._path_history.clear()
         self.get_logger().info(
             f'New goal received: ({self._goal_x:.2f}, {self._goal_y:.2f})')
@@ -225,10 +249,31 @@ class APFPlannerNode(Node):
     # -------------------------------------------------------------------- #
     # Main control loop                                                     #
     # -------------------------------------------------------------------- #
+    def _fused_callback(self, msg: ObstacleArray):
+        """Store velocity-augmented obstacle data from sensor fusion."""
+        obs_list = []
+        for obs in msg.obstacles:
+            if obs.x != 0.0 or obs.y != 0.0:
+                obs_list.append((obs.x, obs.y, obs.vx, obs.vy))
+        self._fused_obstacles = obs_list
+
+    def _mode_callback(self, msg: String):
+        """Respond to supervisor mode changes."""
+        was_active = self._active
+        self._active = (msg.data == 'apf')
+        if self._active and not was_active:
+            self.get_logger().info('APF activated by supervisor')
+            self._stuck_start = None  # reset stuck detection
+        elif not self._active and was_active:
+            self.get_logger().info('APF deactivated by supervisor')
+
     def _control_loop(self):
         """Execute one planning cycle at the control rate."""
 
         if self._state == PlannerState.IDLE:
+            return
+
+        if not self._active:
             return
 
         if self._state == PlannerState.REACHED:
@@ -248,9 +293,15 @@ class APFPlannerNode(Node):
             return
 
         # ---- Escape manoeuvre state machine -----------------------------
+        # In supervised mode, skip internal escape — the supervisor handles
+        # stuck detection and delegates to MPC/RL
         if self._state == PlannerState.ESCAPING:
-            self._execute_escape()
-            return
+            if self._supervised:
+                # Supervisor handles recovery — just return to NAVIGATING
+                self._state = PlannerState.NAVIGATING
+            else:
+                self._execute_escape()
+                return
 
         # ---- Compute APF forces -----------------------------------------
         if self._scan is None:
@@ -266,33 +317,38 @@ class APFPlannerNode(Node):
         self.pub_force.publish(fv)
 
         # ---- Local minima detection ------------------------------------
+        # In supervised mode, don't enter escape — just keep publishing
+        # APF forces (even if tiny). The supervisor monitors progress
+        # and will switch to MPC/RL if needed.
         speed = math.hypot(self._robot_vx, self._robot_vy)
-        if speed < self._stuck_v:
-            now = self.get_clock().now().nanoseconds * 1e-9
-            if self._stuck_start is None:
-                self._stuck_start = now
-            elif (now - self._stuck_start) > self._stuck_t:
-                self.get_logger().warn(
-                    f'Local minimum detected! Speed={speed:.3f} m/s for '
-                    f'{now - self._stuck_start:.1f} s. Initiating escape.')
-                self._state        = PlannerState.ESCAPING
-                self._escape_start = now
-                self._escape_dir   = float(np.random.choice([-1.0, 1.0]))
-                self._stuck_start  = None
-                return
-        else:
-            self._stuck_start = None
+        if not self._supervised:
+            if speed < self._stuck_v:
+                now = self.get_clock().now().nanoseconds * 1e-9
+                if self._stuck_start is None:
+                    self._stuck_start = now
+                elif (now - self._stuck_start) > self._stuck_t:
+                    self.get_logger().warn(
+                        f'Local minimum detected! Speed={speed:.3f} m/s for '
+                        f'{now - self._stuck_start:.1f} s. Initiating escape.')
+                    self._state        = PlannerState.ESCAPING
+                    self._escape_start = now
+                    self._escape_dir   = float(np.random.choice([-1.0, 1.0]))
+                    self._stuck_start  = None
+                    return
+            else:
+                self._stuck_start = None
 
         # ---- Safety stop ------------------------------------------------
         min_dist = self._get_min_obstacle_distance()
         if min_dist < self._d_safe:
             self._publish_stop()
-            self.get_logger().warn(
-                f'Safety stop! Obstacle at {min_dist:.2f} m. Initiating INSTANT escape!')
-            self._state        = PlannerState.ESCAPING
-            self._escape_start = self.get_clock().now().nanoseconds * 1e-9
-            self._escape_dir   = float(np.random.choice([-1.0, 1.0]))
-            self._stuck_start  = None
+            if not self._supervised:
+                self.get_logger().warn(
+                    f'Safety stop! Obstacle at {min_dist:.2f} m. Initiating INSTANT escape!')
+                self._state        = PlannerState.ESCAPING
+                self._escape_start = self.get_clock().now().nanoseconds * 1e-9
+                self._escape_dir   = float(np.random.choice([-1.0, 1.0]))
+                self._stuck_start  = None
             return
 
         # ---- Convert force to velocity command --------------------------
@@ -339,6 +395,7 @@ class APFPlannerNode(Node):
         Compute 2-D repulsive force using the gradient of the inverse-square
         potential, summed over all LiDAR rays within the influence radius.
         Uses a vectorised approach for efficiency.
+        Also includes predictive repulsive forces from tracked obstacle velocities.
         """
         if self._scan is None:
             return np.zeros(2)
@@ -351,32 +408,61 @@ class APFPlannerNode(Node):
         # Filter: finite, within [min, influence_radius]
         valid = np.isfinite(ranges) & (ranges >= 0.05) & (ranges <= self._d_inf)
         if not np.any(valid):
-            return np.zeros(2)
+            F_lidar = np.zeros(2)
+        else:
+            r_v   = ranges[valid]
+            th_v  = angles[valid]
 
-        r_v   = ranges[valid]
-        th_v  = angles[valid]
+            # Obstacle directions in robot frame
+            ox = r_v * np.cos(th_v)
+            oy = r_v * np.sin(th_v)
 
-        # Obstacle directions in robot frame
-        ox = r_v * np.cos(th_v)
-        oy = r_v * np.sin(th_v)
+            # Gradient coefficient: k_rep * (1/d - 1/d0) / d^2
+            coeff = self._k_rep * (1.0 / r_v - 1.0 / self._d_inf) / (r_v ** 2)
 
-        # Gradient coefficient: k_rep * (1/d - 1/d0) / d^2
-        coeff = self._k_rep * (1.0 / r_v - 1.0 / self._d_inf) / (r_v ** 2)
+            # ∇d_obs points toward the obstacle; force is −∇U_rep so away
+            fx = -coeff * (ox / r_v)
+            fy = -coeff * (oy / r_v)
 
-        # ∇d_obs points toward the obstacle; force is −∇U_rep so away
-        # F_rep_i = coeff_i * (−unit_toward_obs) = coeff_i * (unit_away)
-        fx = -coeff * (ox / r_v)
-        fy = -coeff * (oy / r_v)
+            # Sum contributions
+            F_robot = np.array([np.sum(fx), np.sum(fy)])
 
-        # Sum contributions (weighted by influence — closer obstacles dominate)
-        F_robot = np.array([np.sum(fx), np.sum(fy)])
+            # Rotate to world frame
+            yaw = self._robot_yaw
+            c, s = np.cos(yaw), np.sin(yaw)
+            rot_mat = np.array([[c, -s],
+                                [s,  c]])
+            F_lidar = rot_mat.dot(F_robot)
 
-        # Rotate to world frame
-        yaw = self._robot_yaw
-        c, s = np.cos(yaw), np.sin(yaw)
-        rot_mat = np.array([[c, -s],
-                            [s,  c]])
-        F_total = rot_mat.dot(F_robot)
+        # ---- Predictive repulsive force from tracked obstacles --------
+        # Use velocity estimates to repel from predicted future positions
+        F_pred = np.zeros(2)
+        if self._fused_obstacles and self._pred_horizon > 0:
+            yaw = self._robot_yaw
+            c, s = np.cos(yaw), np.sin(yaw)
+            for (ox, oy, vx_r, vy_r) in self._fused_obstacles:
+                # Transform obstacle from robot frame to world frame
+                wx = self._robot_x + c * ox - s * oy
+                wy = self._robot_y + s * ox + c * oy
+                # Transform velocity to world frame
+                wx_v = c * vx_r - s * vy_r
+                wy_v = s * vx_r + c * vy_r
+
+                # Predicted position
+                pred_x = wx + wx_v * self._pred_horizon
+                pred_y = wy + wy_v * self._pred_horizon
+
+                # Repulsive force from predicted position
+                dx = self._robot_x - pred_x
+                dy = self._robot_y - pred_y
+                d = math.hypot(dx, dy)
+
+                if d < self._d_inf and d > 0.05:
+                    pred_coeff = self._k_rep * 0.5 * (1.0/d - 1.0/self._d_inf) / (d**2)
+                    F_pred[0] += pred_coeff * (dx / d)
+                    F_pred[1] += pred_coeff * (dy / d)
+
+        F_total = F_lidar + F_pred
 
         # Clip to prevent numerical explosion near obstacles
         mag = np.linalg.norm(F_total)
@@ -568,7 +654,10 @@ def main(args=None):
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        try:
+            rclpy.shutdown()
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':

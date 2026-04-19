@@ -1,1 +1,0 @@
-/home/craz/mobile_robot_planning/build/obstacle_msgs/ament_cmake_environment_hooks/pythonpath.sh

@@ -1,2 +1,0 @@
-[console_scripts]
-camera_node = camera_processing.camera_node:main

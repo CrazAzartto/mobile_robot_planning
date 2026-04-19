@@ -1,7 +1,0 @@
-Metadata-Version: 2.1
-Name: camera-processing
-Version: 1.0.0
-Summary: Camera preprocessing: rectification, Gaussian blur, HSV segmentation, bounding-box detection
-Maintainer: Sunny Kumar
-Maintainer-email: student@university.edu
-License: MIT

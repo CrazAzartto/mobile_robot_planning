@@ -1,0 +1,44 @@
+# ROS 2 build artifacts
+build/
+install/
+log/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.byte
+*.egg-info/
+.eggs/
+
+# ROS 2 log files
+*.log
+
+# Gazebo/Robotics artifacts
+*.sdf.erb
+*.urdf.erb
+
+# Results and datasets
+eval_results/
+*.csv
+*.bag
+*.mcap
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# C++ artifacts
+*.o
+*.so
+*.a
